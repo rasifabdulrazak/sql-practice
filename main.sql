@@ -118,7 +118,17 @@ SELECT city FROM customer1 MINUS SELECT city FROM customer2;
 
 ---You have 4 tables - customer(name),hotel(name),bookings(customer_id,hotel_id) and booking charges(hotel_id,amount). Write SQL query to perform top 2 customer who has spent the most money in hotel ABC.
 ---# Tables 
---# guest - name, email, country, guest_id 
---# hotels - name, city, star_rating, hotel_id 
---# bookings - guest_id, hotel_id, check_in, check_out, status 
----# booking_charges - booking_id, charge_date, amount
+--# guest - name, email, country, guest_id -g
+--# hotels - name, city, star_rating, hotel_id -ht
+--# bookings - guest_id, hotel_id, check_in, check_out, status  -b
+---# booking_charges - booking_id, charge_date, amount  -bc
+----- SQL Query
+SELECT g.name,SUM(bc.amount) as total_amount
+FROM guest g
+JOIN bookings b ON g.guest_id=b.guest_id
+JOIN hotels ht ON b.hotel_id=ht.hotel_id
+JOIN booking_charges bc on bc.booking_id=b.bookung_id
+WHERE ht.name='ABC' AND b.status='completed'
+GROUP BY g.guest_id,g.name
+ORDER BY total_amount DESC
+LIMIT 2;
