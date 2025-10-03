@@ -56,3 +56,69 @@ SELECT empname,salary,d.deptno,dname,loc FROM employee e, dept d WHERE e.deptno=
 SELECT d.deptno,dname,SUM(salary) FROM employee e dept d WHERE e.deptno=d.deptno GROUP BY deptno;
 
 -- SELF JOIN
+-- More salary than manager
+SELECT e1.empname,e1.salary,e2.empname as manager,e2.salary as manager_salary FROM employee e1,employee e2 WHERE e1.mgr=e2.empid AND e1.salary>e2.salary;
+-- Employee and his manager
+SELECT e1.empname as employee,e2.empname as manager FROM employee e1,employee e2 WHERE e1.mgr=e2.emp_no;
+
+-- LEFT JOIN SQL
+-- All rows from left table
+-- Macthing values from right table
+-- Null values in place of non macthing rows in other table
+SELECT rownum,empno,empname,employee.deptno,dname,loc,job FROM employee LEFT JOIN dept ON employee.deptno = dept.deptno and dname="chaichao";
+
+-- RIGHT JOIN SQL
+-- All rows from right table    
+-- Macthing values from left table
+-- Null values in place of non macthing rows in other table
+SELECT empname,job,sal,loc,dname,dept.deptno FROM employee RIGHT JOIN dept ON dept.deptno=employee.deptno;
+
+-- FULL JOIN SQL
+-- All rows from both tables
+-- Macthing values from both tables
+-- Null values in place of non macthing rows in tables
+SELECT empname ,sal,d.deptno,e.deptno,dname,loc FROM employee e FULL JOIN dept d ON d.deptno = e.deptno;
+
+
+-- Cross Join in SQL
+-- Cartesian product of both tables
+-- cross product operation performed
+SELECT empname,d.deptno,sal,dname,loc FROM employee e CROSS JOIN dept d;
+
+
+-- Display first n rows or last n rows in SQL
+SELECT * FROM employee WHERE rownum<=3; -- first 3 rows
+SELECT * FROM (SELECT * FROM employee ORDER BY empid DESC) WHERE rownum<=3; -- last 3 rows
+
+
+-- Nth highest salary
+SELECT DISTINCT salary FROM employee ORDER BY salary DESC OFFSET 1 ROWS FETCH NEXT 1 ROWS ONLY; -- 2nd highest
+SELECT DISTINCT salary FROM employee ORDER BY salary DESC OFFSET 3 ROWS FETCH NEXT 1 ROWS ONLY; -- 4th highest
+SELECT DISTINCT salary FROM employee ORDER BY salary DESC OFFSET 4 ROWS FETCH NEXT 1 ROWS ONLY; -- 5th highest
+
+
+--Intersection in SQL
+-- return common records from both tables
+SELECT city FROM customer1 INTERSECT SELECT city FROM customer2;
+
+
+--MINUS in SQL
+-- return records from first table which are not in second table
+SELECT city FROM customer1 MINUS SELECT city FROM customer2;
+
+
+--Frist Normal Form (1NF)
+-- Atomic values
+-- No repeating groups
+-- Each column contains unique values
+-- Each record is unique
+-- Each column contains values of a single type
+-- Each column must contain values of a single type
+
+
+---You have 4 tables - customer(name),hotel(name),bookings(customer_id,hotel_id) and booking charges(hotel_id,amount). Write SQL query to perform top 2 customer who has spent the most money in hotel ABC.
+---# Tables 
+--# guest - name, email, country, guest_id 
+--# hotels - name, city, star_rating, hotel_id 
+--# bookings - guest_id, hotel_id, check_in, check_out, status 
+---# booking_charges - booking_id, charge_date, amount
