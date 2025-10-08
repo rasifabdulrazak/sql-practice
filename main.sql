@@ -284,16 +284,28 @@ GROUP BY c.customer_name
 
 -- 5️⃣ Get all orders handled by employees working in the 'Marketing' department.
 -- (JOIN: orders + employees + departments)
-SELECT 
+SELECT * from orders o
+JOIN employees e on e.emp_id = o.emp_id
+JOIN departments d on d.dept_id=e.dept_id
+WHERE d.name ='Marketing'
+
 
 -- 6️⃣ Find all customers who ordered at least one 'Electronics' product.
 -- (JOIN: customers + orders + order_items + products, DISTINCT)
-
+SELECT * FROM customers WHERE cust_id IN ( 
+SELECT DISTINCT cust_id from orders
+)
 -- 7️⃣ Show each product’s average review rating.
 -- (JOIN: product_reviews + products, GROUP BY)
+SELECT p.name AVG(pr.rating) FROM products p
+JOIN product_reviews pr on pr.prod_id=p.prod_id
+GROUP BY p.name
 
 -- 8️⃣ Find all employees who have subordinates (self join on employees).
 -- (JOIN: employees e1 + employees e2 WHERE e1.emp_id = e2.manager_id)
+SELECT e1.name FROM employees e1
+JOIN employees e2 on e1.emp_id = e2.emp_id
+WHERE e1.emp_id = e2.manager_id
 
 -- 🟠 Level 3 – Advanced Analytical Joins
 
