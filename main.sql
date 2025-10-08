@@ -133,6 +133,8 @@ GROUP BY g.guest_id,g.name
 ORDER BY total_amount DESC
 LIMIT 2;
 
+
+
 -- Most number of bookings in Taj Hotel
 -- SQL Query
 SELECT g.name,COUNT(b.booking_id) as total_bookings
@@ -147,7 +149,7 @@ LIMIT 1;
 -- Guests activesly staying in any hotel today
 -- SQL Query
 SELECT g.name,b.check_in,b.check_out,ht.name
-FROM guest groups
+FROM guest g
 JOIN bookings b on b.guest_id = g.guest_id
 WHERE CURRENT_DATE() BETWEEN b.check_in AND b.check_out
 
@@ -195,3 +197,154 @@ JOIN bookings b on b.guest_id = g.guest_id
 GROUP BY g.guest_id,g.name
 HAVING hotel_count>3
 ORDER BY hotel_count DESC;
+
+
+-- Hotels that have never had a booking
+-- SQL Query
+SELECT ht.name,ht.city
+FROM hotels ht
+LEFT JOIN bookings b on b.hotel_id = ht.hotel_id
+WHERE b.booking_id IS NULL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----Matching values to a seperate coloumn in SQL ("rasif","apple,orange,banana") => person=>rasif ,apple=>yes,orange=>yes,banana=>yes
+SELECT person
+CASE WHEN basket LIKE "%apple%" THEN "yes" ELSE "no" END AS apple,
+CASE WHEN basket LIKE "%orange%" THEN "yes" ELSE "no" END AS orange,
+CASE WHEN basket LIKE "%banana%" THEN "yes" ELSE "no" END AS banana
+FROM fruits;
+
+SELECT person,
+IF (FIND_IN_SET("apple",basket)>0,"Yes","No") AS appple,
+IF (FIND_IN_SET("orange",basket)>0,"Yes","No") AS orange
+IF (FIND_IN_SET("banana",basket)>0,"Yes","No") AS banana
+FROM fruits;
+
+
+SELECT name,
+CONCAT(name,"-",substring(job,1,1)) AS new_name
+FROM employee;
+
+
+-- Question
+-- Tables:
+    -- 1️⃣ employees(emp_id, emp_name, manager_id, dep_id, salary, hire_date)
+    -- 2️⃣ departments(dep_id, dep_name, location)
+    -- 3️⃣ customers(cust_id, cust_name, city,email)
+    -- 4️⃣ products(prod_id, prod_name, category, price)
+    -- 5️⃣ orders(order_id, cust_id, emp_id, order_date, amount)
+    -- 6️⃣ order_items(order_item_id, order_id, prod_id, quantity)
+    -- 7️⃣ payments(payment_id, order_id, payment_date, amount, payment_method)
+    -- 7️⃣ productsreview(review_id, product_id, cust_id, rating, review_text)
+
+-- Questions:
+-- 🟢 Level 1 – Basic Joins
+
+-- 1️⃣ List all orders with customer names and order dates.
+-- (JOIN: orders + customers)
+
+SELECT c.cust_name,o.order_date FROM customers c
+INNER JOIN orders o on o.cust_id = c.cust_id
+
+-- 2️⃣ Fetch all employees along with their department names.
+-- (JOIN: employees + departments)
+SELECT e.*,d.dep_name from employees e 
+INNER JOIN department d on d.dep_id = e.dep_id
+
+-- 3️⃣ Show product name, category, and quantity sold in each order.
+-- (JOIN: order_items + products)
+SELECT p.product_name,o.category,SUM(oi.quantity) FROM orders o
+JOIN order_items oi on oi.order_id=o.order_id
+JOIN products p on p.prod_id = oi.prod_id
+
+-- 🟡 Level 2 – Intermediate Joins
+
+-- 4️⃣ List customer names and their total order amount.
+-- (JOIN: customers + orders, use SUM and GROUP BY)
+SELECT c.customer_name,SUM(o.amount) FROM customers c 
+JOIN orders o on o.customer_id = c.customer_id
+GROUP BY c.customer_name
+
+-- 5️⃣ Get all orders handled by employees working in the 'Marketing' department.
+-- (JOIN: orders + employees + departments)
+SELECT 
+
+-- 6️⃣ Find all customers who ordered at least one 'Electronics' product.
+-- (JOIN: customers + orders + order_items + products, DISTINCT)
+
+-- 7️⃣ Show each product’s average review rating.
+-- (JOIN: product_reviews + products, GROUP BY)
+
+-- 8️⃣ Find all employees who have subordinates (self join on employees).
+-- (JOIN: employees e1 + employees e2 WHERE e1.emp_id = e2.manager_id)
+
+-- 🟠 Level 3 – Advanced Analytical Joins
+
+-- 9️⃣ Get top 3 customers by total amount spent.
+-- (JOIN: customers + orders, GROUP BY + ORDER BY + LIMIT)
+
+-- 🔟 List all customers who made payments using ‘UPI’.
+-- (JOIN: customers + orders + payments)
+
+-- 11️⃣ Find products never ordered by any customer.
+-- (LEFT JOIN: products LEFT JOIN order_items WHERE order_id IS NULL)
+
+-- 12️⃣ Find average rating for each product category (need multi-join).
+-- (JOIN: product_reviews + products GROUP BY category)
+
+-- 13️⃣ Get total revenue per department (based on orders handled by their employees).
+-- (JOIN: orders + employees + departments, GROUP BY department)
+
+-- 🔵 Level 4 – Expert Multi-Joins
+
+-- 14️⃣ For each customer, show: total orders, total amount spent, and average payment amount.
+-- (JOIN: customers + orders + payments, GROUP BY customer_id)
+
+-- 15️⃣ Show the best-selling product (highest total quantity sold).
+-- (JOIN: order_items + products, GROUP BY product_id ORDER BY SUM(quantity))
+
+-- 16️⃣ Find the employee with the highest total sales (sum of order amounts).
+-- (JOIN: employees + orders, GROUP BY emp_id)
+
+-- 17️⃣ Show all employees who have handled orders for customers from their own city (cross join logic).
+-- (JOIN: employees + orders + customers, match by location/city)
+
+-- 18️⃣ List departments that have not made any sales (via their employees).
+-- (LEFT JOIN: departments LEFT JOIN employees LEFT JOIN orders WHERE order_id IS NULL)
+
+-- 🟣 Level 5 – Expert Challenges
+
+-- 19️⃣ Find customers who reviewed a product but never purchased it.
+-- (LEFT JOIN product_reviews + orders → FILTER missing match)
+
+-- 20️⃣ Get top-rated product in each category (use window function).
+-- 21️⃣ Get cumulative revenue by month (window function).
+
+-- 22️⃣ Find the manager who manages employees with the highest combined salary.
+-- (Self JOIN employees on manager_id, GROUP BY manager)
+
+-- 23️⃣ Show the most profitable product category based on sales amount.
+-- (JOIN: order_items + products, SUM(price * quantity), GROUP BY category)
+
+-- 24️⃣ Get the average order value per city.
+-- (JOIN: orders + customers, GROUP BY city)
+
+-- 25️⃣ Find employees who handled orders worth more than their own salary.
+-- (JOIN: employees + orders, HAVING SUM(total_amount) > salary)
