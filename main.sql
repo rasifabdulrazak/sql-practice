@@ -208,22 +208,6 @@ WHERE b.booking_id IS NULL;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ----Matching values to a seperate coloumn in SQL ("rasif","apple,orange,banana") => person=>rasif ,apple=>yes,orange=>yes,banana=>yes
 SELECT person
 CASE WHEN basket LIKE "%apple%" THEN "yes" ELSE "no" END AS apple,
@@ -311,29 +295,65 @@ WHERE e1.emp_id = e2.manager_id
 
 -- 9️⃣ Get top 3 customers by total amount spent.
 -- (JOIN: customers + orders, GROUP BY + ORDER BY + LIMIT)
+SELECt c.cust_id,c.name,SUM(o.total_amount) as total_spent FROM customers c 
+JOIN orders o on o.customer_id = c.customer_id
+GROUP BY c.cust_id,c.name
+ORDER BY total_spent DESC
+LIMIT 3
 
 -- 🔟 List all customers who made payments using ‘UPI’.
 -- (JOIN: customers + orders + payments)
+SELECT c.customer_id,c.name FROM customers c 
+JOIN orders o on o.customer_id = c.customer_id
+JOIN payments p on p.order_id = o.order_id
+WHERE p.method = 'UPI'
 
 -- 11️⃣ Find products never ordered by any customer.
 -- (LEFT JOIN: products LEFT JOIN order_items WHERE order_id IS NULL)
+SELECT prod_id,name FROM products WHERE prod_id NOT IN(
+SELECT DISTINCT prod_id FROM orderitems
+)
+SELECT p.name FROM products p 
+LEFT JOIN order_items oi on oi.product_id=p.product_id
+WHERE p.product_id=NULL
 
 -- 12️⃣ Find average rating for each product category (need multi-join).
 -- (JOIN: product_reviews + products GROUP BY category)
+SELECT p.category , AVG(pr.rating) FROM products p 
+JOIN product_reviews pr ON pr.product_id = p.product_id
+GROUP BY p.category
+
 
 -- 13️⃣ Get total revenue per department (based on orders handled by their employees).
 -- (JOIN: orders + employees + departments, GROUP BY department)
+SELECT dept.dept_name , SUM(o.total_amount)  FROM departments dept
+JOIN employees e ON e.dept_id = dept.dept_id
+JOIN orders o ON o.emp_id = e.emp_id
+GROUP BY dept.dept_name
 
 -- 🔵 Level 4 – Expert Multi-Joins
 
 -- 14️⃣ For each customer, show: total orders, total amount spent, and average payment amount.
 -- (JOIN: customers + orders + payments, GROUP BY customer_id)
+SELECT c.customer_id,c.name,COUNT(o.order_id) as total_order,SUM(o.total_amount) as total_amount,AVG(p.amount) as avg_paid FROM customers c 
+JOIN orders o ON o.customer_id = c.customer_id
+JOIN payments p ON p.order_id = o.order_id
+GROUP BY c.customer_id, c.name;
 
 -- 15️⃣ Show the best-selling product (highest total quantity sold).
 -- (JOIN: order_items + products, GROUP BY product_id ORDER BY SUM(quantity))
+SELECT p.product_id,p.product_name,SUM(oi.quantity) as qauntity_sold FROM products p 
+JOIN order_items oi on oi.product_id = p.product_id
+GROUP BY p.product_id,p.product_name
+ORDER BY qauntity_sold DESC
+
 
 -- 16️⃣ Find the employee with the highest total sales (sum of order amounts).
 -- (JOIN: employees + orders, GROUP BY emp_id)
+SELECT e.employee_id,e.name ,SUM(o.total_amount) as total_sales FROM employees e 
+JOIN orders o ON o.emp_id = e.emp_id
+GROUP BY e.employee_id,e.name
+ORDER BY total_sales;
 
 -- 17️⃣ Show all employees who have handled orders for customers from their own city (cross join logic).
 -- (JOIN: employees + orders + customers, match by location/city)
