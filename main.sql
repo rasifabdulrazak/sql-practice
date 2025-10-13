@@ -380,3 +380,31 @@ ORDER BY total_sales;
 
 -- 25️⃣ Find employees who handled orders worth more than their own salary.
 -- (JOIN: employees + orders, HAVING SUM(total_amount) > salary)
+
+
+-- Window functions
+-- -----------------------------------------------------------------------------------------------------
+-- sale_id	    employee_id	    region	    sale_date	    amount
+--      1	            101	      East	    2024-01-02	       200
+--      2	            101	      East	    2024-01-05	       500
+--      3	            102	      West	    2024-01-03	       400
+--      4	            102	      West	    2024-01-10	       600
+--      5	            103	      East	    2024-01-04	       300
+--      6	            101       East	    2024-02-01	       700
+--      7	            102	      West	    2024-02-05	       800
+--      8	            103	      East	    2024-02-08	       1000
+
+-- 🔹 Q1. Find the top 2 sales per region by amount.
+-- Goal: Rank sales within each region and return the top 2 per region.
+
+-- 🔹 Q2. Compute the running total of sales per employee ordered by date.
+-- Goal: Show how much each employee has cumulatively sold up to each date.
+
+-- 🔹 Q4. Find employees whose latest sale is their personal highest.
+-- Goal: Use both MAX() and FIRST_VALUE() window logic.
+
+-- 🔹 Q5. Compute the % contribution of each sale to monthly regional total.
+-- Goal: Find how much each sale contributes to its region’s monthly sales sum.
+
+-- 🔹Q6. Find 3-month rolling average sales per region (by sale_date).
+
