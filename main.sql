@@ -408,3 +408,94 @@ ORDER BY total_sales;
 
 -- 🔹Q6. Find 3-month rolling average sales per region (by sale_date).
 
+
+
+
+-- Master window functions
+-- employees(emp_id, emp_name, department, salary, join_date)
+-- sales(sale_id, emp_id, sale_amount, sale_date, region)
+-- orders(order_id, customer_id, order_date, total_amount)
+-- customers(customer_id, customer_name, city)
+
+-- 🧠 Beginner Level (Understand Ranking and Row Numbering)
+
+-- Find the top 3 highest-paid employees per department.
+-- 👉 Use: RANK() or DENSE_RANK() with PARTITION BY department ORDER BY salary DESC.
+
+-- Assign a unique sequence number to each employee ordered by salary (within their department).
+-- 👉 Use: ROW_NUMBER() vs RANK() — note the difference when duplicates exist.
+
+-- List employees whose salary rank is within top 10 across the whole company.
+-- 👉 Use: RANK() without partition.
+
+-- Show the employee with the second-highest salary per department.
+-- 👉 Use: Subquery with RANK() or DENSE_RANK() filter WHERE rank = 2.
+
+-- Find employees who joined earliest in each department.
+-- 👉 Use: FIRST_VALUE(join_date) or MIN(join_date) with OVER(PARTITION BY).
+
+-- ⚙️ Intermediate Level (Lead/Lag and Moving Aggregates)
+
+-- Find the previous and next salary for each employee (based on salary order within department).
+-- 👉 Use: LAG(salary) and LEAD(salary) with partition.
+
+-- Calculate the difference between each employee’s salary and the previous employee’s salary (within department).
+-- 👉 Use: salary - LAG(salary).
+
+-- Find each month’s sales and the growth compared to the previous month per region.
+-- 👉 Use: LAG(sales_amount) and compute growth percentage.
+
+-- Find customers whose current order amount is less than their previous order amount.
+-- 👉 Use: LAG(total_amount) and compare.
+
+-- For each salesperson, show their total sales and the running total by sale_date.
+-- 👉 Use: SUM(sale_amount) OVER(PARTITION BY emp_id ORDER BY sale_date).
+
+-- 💡 Advanced Level (NTILE, FIRST_VALUE, LAST_VALUE, Cumulative & Sliding Windows)
+
+-- Divide employees in each department into 4 salary bands (quartiles).
+-- 👉 Use: NTILE(4) OVER(PARTITION BY department ORDER BY salary DESC).
+
+-- Find the first and last sale amount per employee in each region.
+-- 👉 Use: FIRST_VALUE(sale_amount) and LAST_VALUE(sale_amount) with frame specification.
+
+-- Calculate the rolling 3-month average sales for each region.
+-- 👉 Use: AVG(sale_amount) OVER(PARTITION BY region ORDER BY sale_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW).
+
+-- Find for each employee, how many employees earn more than them in their department.
+-- 👉 Use: COUNT(*) OVER(PARTITION BY department ORDER BY salary DESC ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) or self join.
+
+-- Compute the cumulative percentage of salary by department.
+-- 👉 Use: SUM(salary) OVER(PARTITION BY department ORDER BY salary) divided by total per department.
+
+-- 🧮 Expert Level (Combining Multiple Window Functions)
+
+-- Find the employee who contributed the highest sales each month.
+-- 👉 Combine: SUM(sale_amount) OVER(PARTITION BY emp_id, month) + RANK().
+
+-- Compare each employee’s salary with department average and company average.
+-- 👉 Use two window aggregates:
+-- AVG(salary) OVER(PARTITION BY department) and AVG(salary) OVER().
+
+-- For each department, show employees who have more than average salary of that department.
+-- 👉 Use: AVG(salary) OVER(PARTITION BY department) and filter.
+
+-- Find customers who are in the top 10% of total order value.
+-- 👉 Use: NTILE(10) and filter tile = 1.
+
+-- Show month-over-month cumulative sales trend for each region and percentage change from previous month.
+-- 👉 Use:
+
+-- SUM(sales_amount) OVER(PARTITION BY region ORDER BY month)
+
+-- LAG() for previous cumulative
+
+-- % growth = (current - previous)/previous * 100
+
+-- 🧩 Bonus Challenge:
+
+-- Create your own metric:
+
+-- “For each employee, compute the difference between their salary and the median salary in their department.”
+
+-- 👉 Hint: Use a CTE with PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY salary) + OVER (PARTITION BY department) (supported in PostgreSQL, Snowflake, etc.)
